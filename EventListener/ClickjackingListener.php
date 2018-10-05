@@ -49,6 +49,11 @@ class ClickjackingListener extends AbstractContentTypeRestrictableListener
             return;
         }
 
+        if ($response->headers->has('X-Frame-Options')) {
+            // Do not overwrite an existing header
+            return;
+        }
+
         // skip non-listed hosts
         if (!empty($this->hosts) && !preg_match('{'.$this->hosts.'}i', $request->getHost() ?: '/')) {
             return;

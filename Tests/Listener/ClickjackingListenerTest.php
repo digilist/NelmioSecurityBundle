@@ -122,4 +122,19 @@ class ClickjackingListenerTest extends \PHPUnit\Framework\TestCase
         $response = $this->callListener($this->listener, $hostAndPath, true);
         $this->assertEquals(null, $response->headers->get('X-Frame-Options'));
     }
+
+    /**
+     * @dataProvider provideClickjackingMatches
+     */
+    public function testClickjackingWithAlreadyDefinedHeader($path, $result)
+    {
+        $request = Request::create($path);
+        $response = new Response();
+        $response->headers->set('X-Frame-Options', 'ALLOW');
+
+        $event = new FilterResponseEvent($this->kernel, $request, HttpKernelInterface::MASTER_REQUEST, $response);
+        $this->listener->onKernelResponse($event);
+
+        $this->assertEquals('ALLOW', $response->headers->get('X-Frame-Options'));
+    }
 }
